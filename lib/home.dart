@@ -17,7 +17,7 @@ enum Mode { none, add, delete, link, drag, calculate }
 class _HomeState extends State<Home> {
   int _counter = 1;
   int? selectedNodeIndex;
-
+  String _weight = '';
   Mode mode = Mode.none;
   List<NodeModel> nodes = [];
   List<LinkModel> links = [];
@@ -70,12 +70,27 @@ class _HomeState extends State<Home> {
                     selectedNodeIndex = posTarget;
                   } else {
                     int? posSource = selectedNodeIndex;
+                    openWeightInputDialog(context, (String weight) {
+
+                      setState(() {
+                        // print("weight: $weight");
+                        // links.add(LinkModel(weight, nodes[posSource!], nodes[posTarget]));
+                        _weight = weight;
+
+                      });
+                    });
                     setState(() {
-                      links.add(LinkModel("1", nodes[posSource!], nodes[posTarget]));
+                      links.add(LinkModel(_weight, nodes[posSource!], nodes[posTarget]));
                     });
                     selectedNodeIndex = null;
+
                   }
                 }
+                //show alert dialog to set weight
+
+                links.forEach((element) {
+                  print("weight: ${element.weight}");
+                });
               }
             },
 
@@ -168,5 +183,50 @@ class _HomeState extends State<Home> {
     return pos;
   }
 
+
+
+  Future<void> openWeightInputDialog(BuildContext context, Function(String) onWeightEntered) async {
+    String weight = ''; // Variable para almacenar el peso ingresado
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text('Ingrese el peso del enlace'),
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(16.0),
+              child: TextField(
+                decoration: InputDecoration(labelText: 'Peso'),
+                onChanged: (value) {
+                  weight = value;
+                },
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Cerrar el diálogo
+                  },
+                  child: Text('Cancelar'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (weight.isNotEmpty) {
+                      onWeightEntered(weight); // Llamar a la función de devolución de llamada con el peso ingresado
+                      Navigator.of(context).pop(); // Cerrar el diálogo
+                    }
+                  },
+                  child: Text('Aceptar'),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
 
 }

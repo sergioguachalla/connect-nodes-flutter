@@ -45,7 +45,19 @@ class DrawNode extends CustomPainter{
 
 class DrawLink extends CustomPainter{
   List<LinkModel> links = [];
-
+  _message(double x, double y, String text, Canvas canvas){
+    TextSpan span = TextSpan(
+      style: TextStyle(color: Colors.white, fontSize: 20),
+      text: text,
+    );
+    TextPainter tp = TextPainter(
+      text: span,
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.rtl,
+    );
+    tp.layout();
+    tp.paint(canvas, Offset(x, y));
+  }
   DrawLink(this.links);
 
   @override
@@ -57,6 +69,7 @@ class DrawLink extends CustomPainter{
     links.forEach((element) {
       paint.color = element.source.color;
       canvas.drawLine(Offset(element.source.x, element.source.y), Offset(element.target.x, element.target.y), paint);
+      _message(element.source.x + (element.target.x - element.source.x)/2, element.source.y + (element.target.y - element.source.y)/2, element.weight, canvas);
     });
   }
 
